@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Furnish.WebUI.Context;
 using Furnish.WebUI.Dtos.CategoryDtos;
+using System.Data;
 
 namespace Furnish.WebUI.Services.CategoryServices
 {
@@ -8,48 +9,54 @@ namespace Furnish.WebUI.Services.CategoryServices
     {
 
         private readonly DapperContext _context;
+        private readonly IDbConnection _db;
 
         public CategoryService(DapperContext context)
         {
             _context = context;
+            _db = context.CreateConnection();
         }
 
-        public Task CreateAsync(CreateCategoryDto createCategoryDto)
+        public async Task CreateAsync(CreateCategoryDto createCategoryDto)
         {
-            throw new NotImplementedException();
+            string query = "insert into categories (CategoryName) values (@CategoryName)";
+            var parameters = new DynamicParameters();
+            parameters.Add("@CategoryName", createCategoryDto.CategoryName);
+            await _db.ExecuteAsync(query, parameters);
         }
 
-        public Task DeleteAsync(int id)
+        public async Task DeleteAsync(int id)
         {
-            throw new NotImplementedException();
+            string query = "delete from categories where Id=@Id";
+            var parameters = new DynamicParameters();
+            parameters.Add("@Id", id);
+            await _db.ExecuteAsync(query, parameters);
         }
 
         public async Task<IEnumerable<ResultCategoryDto>> GetAllAsync()
         {
-            var connection = _context.CreateConnection();
-
+            
             string query = "select * from categories";
-
-            return await connection.QueryAsync<ResultCategoryDto>(query);
-
+            return await _db.QueryAsync<ResultCategoryDto>(query);
         }
 
         public async Task<UpdateCategoryDto> GetByIdAsync(int id)
         {
-            var connection = _context.CreateConnection();
-
+          
             string query = "select * from categories where Id=@Id";
-
             var parameters = new DynamicParameters();
             parameters.Add("@Id", id);
-
-            return await connection.QueryFirstOrDefaultAsync<UpdateCategoryDto>(query, parameters);
+            return await _db.QueryFirstOrDefaultAsync<UpdateCategoryDto>(query, parameters);
 
         }
 
-        public Task UpdateAsync(UpdateCategoryDto updateCategoryDto)
+        public async Task UpdateAsync(UpdateCategoryDto updateCategoryDto)
         {
-            throw new NotImplementedException();
+            string query = "update categories set CategoryName=@CategoryName where Id=@Id";
+            var parameters = new DynamicParameters();
+            parameters.Add("@CategoryName", updateCategoryDto.CategoryName);
+            parameters.Add("@Id", updateCategoryDto.Id);
+            await _db.ExecuteAsync(query, parameters);
         }
     }
 }

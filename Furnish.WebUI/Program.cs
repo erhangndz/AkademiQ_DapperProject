@@ -1,4 +1,5 @@
 using Furnish.WebUI.Context;
+using Furnish.WebUI.Services.CategoryServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddScoped<DapperContext>();
 
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 
 builder.Services.AddControllersWithViews();
 
